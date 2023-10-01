@@ -105,4 +105,48 @@ galaxies <- read_csv("formatted_galaxies.csv")
 # characteristics in memory. As of March 2022 it should contain 796
 # observations.
 
+# PROBLEM 3
+
+library(ggplot2)
+library(tidyverse)
+
+# Calculate mean and standard deviation for a_26, log_m26, m_b, and log_lk
+mean_a26 <- mean(galaxies$a_26, na.rm = TRUE)
+sd_a26 <- sd(galaxies$a_26, na.rm = TRUE)
+
+mean_log_m26 <- mean(galaxies$log_m26, na.rm = TRUE)
+sd_log_m26 <- sd(galaxies$log_m26, na.rm = TRUE)
+
+mean_mb <- mean(galaxies$m_b, na.rm = TRUE)
+sd_mb <- sd(galaxies$m_b, na.rm = TRUE)
+
+mean_log_lk <- mean(galaxies$log_lk, na.rm = TRUE)
+sd_log_lk <- sd(galaxies$log_lk, na.rm = TRUE)
+
+# Plotting the distributions with overlaid normal distribution curves
+normal_dist <- ggplot(galaxies) +
+  
+  # a_26 distribution
+  geom_density(aes(x=a_26, y=..density.., fill="Linear Diameter (a_26)"), alpha=0.5) + 
+  stat_function(fun=dnorm, args=list(mean=mean_a26, sd=sd_a26), color="darkblue", linetype="dashed") +
+  
+  # log_m26 distribution
+  geom_density(aes(x=log_m26, y=..density.., fill="Log Mass (log_m26)"), alpha=0.5) + 
+  stat_function(fun=dnorm, args=list(mean=mean_log_m26, sd=sd_log_m26), color="darkred", linetype="dashed") +
+  
+  # m_b distribution
+  geom_density(aes(x=m_b, y=..density.., fill="Magnitude (m_b)"), alpha=0.5) + 
+  stat_function(fun=dnorm, args=list(mean=mean_mb, sd=sd_mb), color="darkgreen", linetype="dashed") +
+  
+  # log_lk distribution
+  geom_density(aes(x=log_lk, y=..density.., fill="Log Stellar Mass (log_lk)"), alpha=0.5) + 
+  stat_function(fun=dnorm, args=list(mean=mean_log_lk, sd=sd_log_lk), color="darkorange", linetype="dashed") +
+  
+  theme_minimal() + 
+  labs(title="Density Plots with Normal Distribution Curves", x="Value", y="Density") +
+  scale_fill_manual(values=c("blue", "red", "green", "orange"))+
+  
+  coord_cartesian(xlim=c(0, 20)) # setting desired range 
+
+normal_dist
 
