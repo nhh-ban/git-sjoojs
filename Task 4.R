@@ -49,7 +49,7 @@ ggplot(final, aes(x = Distance, y = Velocity)) +
 # is their velocity in general. So yeah, I agree
 
 # the Hubble's constant for task 2
-final %>% mutate(Hubble = Velocity/Distance) %>% arrange(Name)
-
+final <- final %>% mutate(Hubble = Velocity/Distance) %>% arrange(Name)
+final %>% summarise(Hubble = mean(Hubble))
 
 

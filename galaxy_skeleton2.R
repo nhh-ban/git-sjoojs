@@ -117,8 +117,6 @@ sd_a26 <- sd(galaxies$a_26, na.rm = TRUE)
 mean_log_m26 <- mean(galaxies$log_m26, na.rm = TRUE)
 sd_log_m26 <- sd(galaxies$log_m26, na.rm = TRUE)
 
-mean_mb <- mean(galaxies$m_b, na.rm = TRUE)
-sd_mb <- sd(galaxies$m_b, na.rm = TRUE)
 
 mean_log_lk <- mean(galaxies$log_lk, na.rm = TRUE)
 sd_log_lk <- sd(galaxies$log_lk, na.rm = TRUE)
@@ -133,10 +131,6 @@ normal_dist <- ggplot(galaxies) +
   # log_m26 distribution
   geom_density(aes(x=log_m26, y=..density.., fill="Log Mass (log_m26)"), alpha=0.5) + 
   stat_function(fun=dnorm, args=list(mean=mean_log_m26, sd=sd_log_m26), color="darkred", linetype="dashed") +
-  
-  # m_b distribution
-  geom_density(aes(x=m_b, y=..density.., fill="Magnitude (m_b)"), alpha=0.5) + 
-  stat_function(fun=dnorm, args=list(mean=mean_mb, sd=sd_mb), color="darkgreen", linetype="dashed") +
   
   # log_lk distribution
   geom_density(aes(x=log_lk, y=..density.., fill="Log Stellar Mass (log_lk)"), alpha=0.5) + 
