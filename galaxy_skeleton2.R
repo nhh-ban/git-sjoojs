@@ -16,10 +16,11 @@ library(tidyverse)    # Contains most of what we need.
 # the file does not end with an "end of line"-character (EOL). This does not
 # seem to pose a problem later, and it seems that we can silece the warning by
 # switchin off the "warn"-argument. Do that if you wish.
-raw_file <- readLines(con = "?")
+raw_file <- readLines(con = "http://www.sao.ru/lv/lvgdb/article/suites_dw_Table1.txt")
 
 # Identify the line number L of the separator line between the column names and
 # the rest of the data table.
+raw_file # Line number 15
 
 # Now every line in the file is in its separate element in the character vector
 # "raw_file". The next key step is to identify which line contains the separator
@@ -31,15 +32,15 @@ raw_file <- readLines(con = "?")
 
 # What do you need to replace the two question marks with in order to extract
 # the first two letters?
-substr(x = raw_file, start = ?, stop = ?)
+substr(x = raw_file, start = 1, stop = 2)
 
 # The next step is then to find out *which* line starts with "--", and pick out
 # the first one. This can be done in a nice little pipe, where you have to fill
 # out the question marks and the missing function names:
 L <- 
-  (substr(x = raw_file, start = ?, stop = ?) == "?") %>% 
-  function_that_returns_the_index_of_all_TRUES %>% 
-  function_that_picks_out_the_minimum_value
+  (substr(x = raw_file, start = 1, stop = 2) == "--") %>% 
+  which() %>% 
+  min()
 
 # Save the variable descriptions (i.e. the information in lines 1:(L-2)) in a
 # text-file for future reference using the cat()-function. The first argument is
@@ -47,9 +48,10 @@ L <-
 # "raw_file"-vector on a separate line we also provide the sep-argument, where
 # we put the "end-of-line"-character "\n". We also need to come up with a file
 # name. Replace the question marks:
-cat(?, sep = "\n", file = "?")
+cat(raw_file[1:(L-2)], sep = "\n", file = "Variable descriptions Problem 2")
 
 # Extract the variable names (i.e. line (L-1)), store the names in a vector.
+vector_names <- raw_file[1:(L-1)]
 
 # This is a little bit dirty. We want to *split* the string in raw_data[L-1]
 # *by* the character "|", and then we want to *trim* away all the leading and
@@ -64,7 +66,7 @@ cat(?, sep = "\n", file = "?")
 # apply the str_trim()-function (also in the stringr-package) to get rid of all
 # the empty space. Replace the question mark below:
 variable_names <- 
-  str_split(string = ?, pattern = "\\|") %>% 
+  str_split(string = raw_file[L-1], pattern = "\\|") %>% 
   unlist() %>% 
   str_trim()
 
@@ -79,7 +81,7 @@ variable_names <-
 # super for this kind of search-and-replace. Replace the question mark below.
 
 comma_separated_values <- 
-  ? %>% 
+  raw_file[(L+1):length(raw_file)] %>% 
   gsub("\\|", ",", .) %>% 
   gsub(" ", "", .)
 
@@ -92,15 +94,53 @@ comma_separated_values_with_names <-
     comma_separated_values)    
 
 # Replace the question mark and come up with a file name
-cat(?, sep = "\n", file = "?")
+cat(comma_separated_values_with_names, sep = "\n", file = "formatted_galaxies.csv")
 
 # Read the file back in as a normal csv-file. The readr-package is part of
 # tidyverse, so it is already loaded.
-galaxies <- read_csv("?")
+galaxies <- read_csv("formatted_galaxies.csv")
 
 
 # You should now have a nice, clean data frame with galaxies and their
 # characteristics in memory. As of March 2022 it should contain 796
 # observations.
 
+# PROBLEM 3
+
+library(ggplot2)
+library(tidyverse)
+
+# Calculate mean and standard deviation for a_26, log_m26, m_b, and log_lk
+mean_a26 <- mean(galaxies$a_26, na.rm = TRUE)
+sd_a26 <- sd(galaxies$a_26, na.rm = TRUE)
+
+mean_log_m26 <- mean(galaxies$log_m26, na.rm = TRUE)
+sd_log_m26 <- sd(galaxies$log_m26, na.rm = TRUE)
+
+
+mean_log_lk <- mean(galaxies$log_lk, na.rm = TRUE)
+sd_log_lk <- sd(galaxies$log_lk, na.rm = TRUE)
+
+# Plotting the distributions with overlaid normal distribution curves
+normal_dist <- ggplot(galaxies) +
+  
+  # a_26 distribution
+  geom_density(aes(x=a_26, y=..density.., fill="Linear Diameter (a_26)"), alpha=0.5) + 
+  stat_function(fun=dnorm, args=list(mean=mean_a26, sd=sd_a26), color="darkblue", linetype="dashed") +
+  
+  # log_m26 distribution
+  geom_density(aes(x=log_m26, y=..density.., fill="Log Mass (log_m26)"), alpha=0.5) + 
+  stat_function(fun=dnorm, args=list(mean=mean_log_m26, sd=sd_log_m26), color="darkred", linetype="dashed") +
+  
+  # log_lk distribution
+  geom_density(aes(x=log_lk, y=..density.., fill="Log Stellar Mass (log_lk)"), alpha=0.5) + 
+  stat_function(fun=dnorm, args=list(mean=mean_log_lk, sd=sd_log_lk), color="darkorange", linetype="dashed") +
+  
+  theme_minimal() + 
+  labs(title="Density Plots with Normal Distribution Curves", x="Value", y="Density") +
+  scale_fill_manual(values=c("blue", "red", "green", "orange"))+
+  
+  coord_cartesian(xlim=c(0, 20)) # setting desired range 
+
+normal_dist
 
